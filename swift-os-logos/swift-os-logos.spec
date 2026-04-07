@@ -26,10 +26,11 @@ Provides:   fedora-logos = 44
 
 %description
 Official branding assets for the SwiftOS operating system. 
-All files are namespaced with 'swift-os' to prevent conflicts 
-with desktop environment icons. Legacy paths are symlinked.
+All files are namespaced with 'swift-os' and installed into 
+standard Hicolor icon paths to ensure native GNOME/Desktop compatibility.
 
 %install
+# Tworzenie standardowych ścieżek ikon Freedesktop
 install -d %{buildroot}%{_datadir}/icons/hicolor/scalable/apps
 install -d %{buildroot}%{_datadir}/icons/hicolor/16x16/apps
 install -d %{buildroot}%{_datadir}/icons/hicolor/48x48/apps
@@ -37,32 +38,40 @@ install -d %{buildroot}%{_datadir}/icons/hicolor/128x128/apps
 install -d %{buildroot}%{_datadir}/icons/hicolor/256x256/apps
 install -d %{buildroot}%{_datadir}/icons/hicolor/symbolic/apps
 install -d %{buildroot}%{_datadir}/pixmaps
-install -d %{buildroot}%{_datadir}/fedora-logos
 
+# 1. Instalacja ikon aplikacji (sygnet)
 install -m 0644 %{SOURCE0} %{buildroot}%{_datadir}/icons/hicolor/scalable/apps/swift-os-logo.svg
-install -m 0644 %{SOURCE10} %{buildroot}%{_datadir}/icons/hicolor/scalable/apps/swift-os-logo-transparent.svg
 install -m 0644 %{SOURCE5} %{buildroot}%{_datadir}/icons/hicolor/16x16/apps/swift-os-logo.png
 install -m 0644 %{SOURCE4} %{buildroot}%{_datadir}/icons/hicolor/48x48/apps/swift-os-logo.png
 install -m 0644 %{SOURCE3} %{buildroot}%{_datadir}/icons/hicolor/128x128/apps/swift-os-logo.png
 install -m 0644 %{SOURCE2} %{buildroot}%{_datadir}/icons/hicolor/256x256/apps/swift-os-logo.png
 install -m 0644 %{SOURCE6} %{buildroot}%{_datadir}/icons/hicolor/symbolic/apps/swift-os-logo-symbolic.svg
-install -m 0644 %{SOURCE1} %{buildroot}%{_datadir}/pixmaps/swift-os-logo-text.svg
+
+# 2. Instalacja LOGOTYPU Z TEKSTEM (To, co GNOME widzi w "Informacjach")
+# Nazwa pliku musi pasować do ID=swift-os w os-release
+install -m 0644 %{SOURCE1} %{buildroot}%{_datadir}/icons/hicolor/scalable/apps/swift-os-logo-text.svg
 install -m 0644 %{SOURCE9} %{buildroot}%{_datadir}/pixmaps/swift-os-logo-text-color.svg
 
-# Create SYMBOLIC LINKS for Fedora compatibility
-ln -s ../icons/hicolor/scalable/apps/swift-os-logo.svg %{buildroot}%{_datadir}/fedora-logos/fedora-logo-sprite.svg
-ln -s ../pixmaps/swift-os-logo-text-color.svg %{buildroot}%{_datadir}/fedora-logos/fedora-logo-text.svg
+# 3. Kompatybilność wsteczna (na wypadek, gdyby libadwaita nadal szukała starych ścieżek)
+install -d %{buildroot}%{_datadir}/fedora-logos
+ln -snf ../icons/hicolor/scalable/apps/swift-os-logo.svg %{buildroot}%{_datadir}/fedora-logos/fedora-logo-sprite.svg
+ln -snf ../icons/hicolor/scalable/apps/swift-os-logo-text.svg %{buildroot}%{_datadir}/fedora-logos/fedora-logo-text.svg
+
+%post
+/bin/touch --no-create %{_datadir}/icons/hicolor &>/dev/null || :
+
+%posttrans
+/usr/bin/gtk-update-icon-cache %{_datadir}/icons/hicolor &>/dev/null || :
 
 %files
 %{_datadir}/icons/hicolor/*/apps/swift-os-logo*
 %{_datadir}/pixmaps/swift-os-logo*
-
 %dir %{_datadir}/fedora-logos
 %{_datadir}/fedora-logos/fedora-logo-text.svg
 %{_datadir}/fedora-logos/fedora-logo-sprite.svg
 
 %changelog
-* Tue Apr 07 2026 Kamil Machowski <https://github.com/Emkamil> - 1.0.0-1
-- Initial release with 'swift-os' namespace
-- All system assets renamed to prevent swift-desktop icon conflicts
-- Symbolic links implemented for legacy path compatibility
+* Tue Apr 07 2026 Kamil Machowski <https://github.com/Emkamil> - 1-1
+- Zmiana nazw plików na zgodne z nowym ID systemu (swift-os)
+- Przeniesienie logotypu z tekstem do standardowej ścieżki ikon hicolor
+- Dodanie skryptów aktualizacji cache'u ikon po instalacji
