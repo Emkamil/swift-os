@@ -1,6 +1,6 @@
 Summary:    Official SwiftOS operating system logos and graphics
 Name:       swift-os-logos
-Version:    1
+Version:    1.0.2
 Release:    1%{?dist}
 License:    MIT
 BuildArch:  noarch
@@ -71,7 +71,7 @@ ln -snf ../icons/hicolor/scalable/apps/swift-os-logo-text.svg %{buildroot}%{_dat
 %{_datadir}/fedora-logos/fedora-logo-sprite.svg
 
 %changelog
-* Tue Apr 07 2026 Kamil Machowski <https://github.com/Emkamil> - 1-1
+* Tue Apr 07 2026 Kamil Machowski <https://github.com/Emkamil> - 1.0.2-1
 - Zmiana nazw plików na zgodne z nowym ID systemu (swift-os)
 - Przeniesienie logotypu z tekstem do standardowej ścieżki ikon hicolor
 - Dodanie skryptów aktualizacji cache'u ikon po instalacji
